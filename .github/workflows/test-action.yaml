@@ -1,4 +1,4 @@
-name: Running tests for jivas ElevenlabsTTSAction
+name: Running tests for jivas ElevenLabsTTSAction
 on:
   pull_request:
   push:

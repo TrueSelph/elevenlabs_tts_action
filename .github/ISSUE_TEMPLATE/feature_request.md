@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for the jivas ElevenlabsTTSAction.
+about: Suggest an idea for the jivas ElevenLabsTTSAction.
 title: "[Feature Request]: "
 labels: ''
 assignees: ''
