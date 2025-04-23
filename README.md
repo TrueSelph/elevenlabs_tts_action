@@ -12,7 +12,7 @@ This action facilitates text-to-speech conversion through Elevenlabs API integra
 
 - **Name:** `jivas/elevenlabs_tts_action`
 - **Author:** [V75 Inc.](https://v75inc.com/)
-- **Architype:** `ElevenlabsTTSAction`
+- **Architype:** `ElevenLabsTTSAction`
 
 ## Meta Information
 

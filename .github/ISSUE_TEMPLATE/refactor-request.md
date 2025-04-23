@@ -1,6 +1,6 @@
 ---
 name: Refactor Request
-about: Request a refactor to the jivas ElevenlabsTTSAction.
+about: Request a refactor to the jivas ElevenLabsTTSAction.
 title: "[Refactor Request]: "
 labels: ''
 assignees: ''

@@ -4,21 +4,21 @@ import:py requests;
 import:py uuid;
 import:py os;
 import:py base64;
-import:py from typing { Iterator }
+import:py from typing { Iterator, Union }
 import:py from logging { Logger }
 import:py from elevenlabs { Voice, VoiceSettings, stream, play }
 import:py from elevenlabs.client { ElevenLabs }
 import:jac from jivas.agent.action.tts_action { TTSAction }
 
 
-node ElevenlabsTTSAction :TTSAction: {
+node ElevenLabsTTSAction :TTSAction: {
     # A speech action which integrates with the Deepgram speech to text and text to speech API.
 
     # set up logger
     static has logger:Logger = logging.getLogger(__name__);
 
     has model:str = "eleven_turbo_v2";
-    has voice:str = "IRIS";
+    has voice:str = "Sarah";
 
     can invoke(text:str, as_base64:bool=False, as_url:bool=True) {
         # """
@@ -67,16 +67,32 @@ node ElevenlabsTTSAction :TTSAction: {
         return [];
     }
 
-    can healthcheck() -> bool {
+    can healthcheck() -> Union[bool, dict] {
         try {
-            if(self.model and self.api_key and self.voice){
+            if(not self.api_key) {
+                return {
+                    "status": False,
+                    "message": f"ElevenLabs API key is not set.",
+                    "severity": "error"
+                };
+            }
+            if self.get_models() {
                 return True;
             }
-            return False;
         } except Exception as e {
             self.logger.error(f"An exception occurred in {self.label}:\n{traceback.format_exc()}\n");
-            return False;
+            return {
+                "status": False,
+                "message": f"Check ElevenLabs TTS Action configuration: {e}",
+                "severity": "error"
+            };
         }
+
+        return {
+            "status": False,
+            "message": f"ElevenLabs TTS Action API key may be incorrect or your subscription may be expired.",
+            "severity": "error"
+        };
     }
 
 }

@@ -1,4 +1,4 @@
-name: Linting and Pre-commit checks for jivas ElevenlabsTTSAction
+name: Linting and Pre-commit checks for jivas ElevenLabsTTSAction
 
 on:
   pull_request:

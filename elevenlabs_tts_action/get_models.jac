@@ -14,7 +14,7 @@ walker get_models :interact_graph_walker: {
     }
 
     can on_actions with Actions entry {
-        visit [-->](`?Action)(?enabled==True)(?label=='ElevenlabsTTSAction');
+        visit [-->](`?Action)(?enabled==True)(?label=='ElevenLabsTTSAction');
     }
 
     can on_action with Action entry {

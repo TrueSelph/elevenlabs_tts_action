@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to report any bugs in the jivas ElevenlabsTTSAction.
+about: Create a report to report any bugs in the jivas ElevenLabsTTSAction.
 title: "[BUG]: "
 labels: ''
 assignees: ''

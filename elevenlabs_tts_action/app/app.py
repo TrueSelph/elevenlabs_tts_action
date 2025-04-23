@@ -5,6 +5,8 @@ It sets up the UI for model and voice selection and manages API key input
 and session state.
 """
 
+from typing import Optional
+
 import streamlit as st
 from jvcli.client.lib.utils import call_action_walker_exec
 from jvcli.client.lib.widgets import app_header, app_update_action
@@ -23,63 +25,113 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
     """
     # Add app header controls
     model_key, module_root = app_header(agent_id, action_id, info)
-
-    # Add app main controls
-    if "elevenlabs_models" not in st.session_state:
-        st.session_state["elevenlabs_models"] = call_action_walker_exec(
-            agent_id, module_root, "get_models"
-        )
-
-    if "elevenlabs_voices" not in st.session_state:
-        result = call_action_walker_exec(agent_id, module_root, "get_voices")
-        st.session_state["elevenlabs_voices"] = result.get("voices", result)
-
-    # Create dictionaries to map descriptions to IDs
-    model_info_dict = {
-        f"{model['name']} - {model['description']}": model["model_id"]
-        for model in st.session_state["elevenlabs_models"]
-    }
-    voice_info_dict = {
-        f"{voice['name']}": voice["voice_id"]
-        for voice in st.session_state["elevenlabs_voices"]
-    }
-
-    # Initialize session state for model
-    if not st.session_state[model_key].get("model"):
-        st.session_state[model_key]["model"] = st.session_state["elevenlabs_models"][0][
-            "model_id"
-        ]
-
-    # Initialize session state for voice
-    if not st.session_state[model_key].get("voice"):
-        st.session_state[model_key]["voice"] = st.session_state["elevenlabs_voices"][0][
-            "name"
-        ]
-
-    # API Key input
-    st.session_state[model_key]["api_key"] = st.text_input(
+    # --- Step 1: API Key input
+    api_key = st.text_input(
         "API Key", value=st.session_state[model_key]["api_key"], type="password"
     )
+    st.session_state[model_key]["api_key"] = api_key
 
-    # Model selection
-    selected_model_info = st.selectbox(
-        "Text-to-Speech Model:",
-        options=list(model_info_dict.keys()),
-        index=list(model_info_dict.values()).index(
-            st.session_state[model_key]["model"]
-        ),
-    )
+    show_controls = False
+    models: Optional[list[dict]] = None
+    voices: Optional[list[dict]] = None
+    fetch_error = False
 
-    # Voice selection
-    selected_voice_info = st.selectbox(
-        "Voice:",
-        options=list(voice_info_dict.keys()),
-        index=list(voice_info_dict.keys()).index(st.session_state[model_key]["voice"]),
-    )
+    if api_key:
+        try:
+            if (
+                "elevenlabs_models" not in st.session_state
+                or "elevenlabs_voices" not in st.session_state
+            ):
+                models_result = call_action_walker_exec(
+                    agent_id, module_root, "get_models"
+                )
+                voices_result = call_action_walker_exec(
+                    agent_id, module_root, "get_voices"
+                )
+                # Defensive checks
+                if (
+                    not models_result
+                    or "error" in models_result
+                    or not isinstance(models_result, list)
+                    or not voices_result
+                    or "error" in voices_result
+                    or "voices" not in voices_result
+                    or not isinstance(voices_result["voices"], list)
+                ):
+                    fetch_error = True
+                else:
+                    st.session_state["elevenlabs_models"] = models_result
+                    st.session_state["elevenlabs_voices"] = voices_result["voices"]
+                    models = models_result
+                    voices = voices_result["voices"]
+            else:
+                models_candidate = st.session_state.get("elevenlabs_models")
+                voices_candidate = st.session_state.get("elevenlabs_voices")
+                # Check they're not None and of the expected type
+                if isinstance(models_candidate, list):
+                    models = models_candidate
+                if isinstance(voices_candidate, list):
+                    voices = voices_candidate
+        except Exception:
+            fetch_error = True
 
-    # Update session state with selected model and voice
-    st.session_state[model_key]["model"] = model_info_dict[selected_model_info]
-    st.session_state[model_key]["voice"] = selected_voice_info
+        if fetch_error or models is None or voices is None:
+            st.error(
+                "Failed to fetch models or voices. "
+                "Please check your API key and network connection."
+            )
+        elif not models or not voices:
+            st.warning(
+                "No models or voices available. Check your API key and/or ElevenLabs account."
+            )
+        else:
+            show_controls = True
+    else:
+        st.info("Please provide your ElevenLabs API key to proceed.")
 
-    # Add update button to apply changes
+    # --- Selection controls (shown only if API key and data present/valid)
+    if show_controls:
+        # Initialize selection state (model/voice)
+        if models and len(models) > 0 and not st.session_state[model_key].get("model"):
+            st.session_state[model_key]["model"] = models[0]["model_id"]
+
+        if voices and len(voices) > 0 and not st.session_state[model_key].get("voice"):
+            st.session_state[model_key]["voice"] = voices[0]["name"]
+
+        model_info_dict = (
+            {
+                f"{model['name']} - {model['description']}": model["model_id"]
+                for model in models
+            }
+            if models
+            else {}
+        )
+
+        voice_info_dict = (
+            {f"{voice['name']}": voice["voice_id"] for voice in voices}
+            if voices
+            else {}
+        )
+
+        if model_info_dict:
+            selected_model_info = st.selectbox(
+                "Text-to-Speech Model:",
+                options=list(model_info_dict.keys()),
+                index=list(model_info_dict.values()).index(
+                    st.session_state[model_key]["model"]
+                ),
+            )
+            st.session_state[model_key]["model"] = model_info_dict[selected_model_info]
+
+        if voice_info_dict:
+            selected_voice_info = st.selectbox(
+                "Voice:",
+                options=list(voice_info_dict.keys()),
+                index=list(voice_info_dict.keys()).index(
+                    st.session_state[model_key]["voice"]
+                ),
+            )
+            st.session_state[model_key]["voice"] = selected_voice_info
+
+    # --- Always show update action button
     app_update_action(agent_id, action_id)
