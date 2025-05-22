@@ -8,7 +8,7 @@ and session state.
 from typing import Optional
 
 import streamlit as st
-from jvcli.client.lib.utils import call_action_walker_exec
+from jvcli.client.lib.utils import call_action_walker_exec, call_update_action
 from jvcli.client.lib.widgets import app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
@@ -29,14 +29,23 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
     api_key = st.text_input(
         "API Key", value=st.session_state[model_key]["api_key"], type="password"
     )
-    st.session_state[model_key]["api_key"] = api_key
+
+    if api_key and not st.session_state[model_key]["api_key"]:
+        # update the API key once inputted for first time
+        st.session_state[model_key]["api_key"] = api_key
+        call_update_action(
+            agent_id=agent_id,
+            action_id=action_id,
+            action_data=st.session_state[model_key],
+        )
 
     show_controls = False
     models: Optional[list[dict]] = None
     voices: Optional[list[dict]] = None
     fetch_error = False
 
-    if api_key:
+    # Only fetch models/voices if API key is present and non-empty
+    if st.session_state[model_key]["api_key"]:
         try:
             if (
                 "elevenlabs_models" not in st.session_state

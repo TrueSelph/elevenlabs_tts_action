@@ -28,6 +28,11 @@ node ElevenLabsTTSAction :TTSAction: {
         # :param base64_mode: outputs audio file as base64 encoded string
         # :return: Path to the saved audio file or base64 encoded string
         # """
+
+        if not self.api_key {
+            return None;
+        }
+
         audio = None;
         # overridden with specifics of TTS model
         try {
