@@ -1,17 +1,17 @@
-import:py logging;
-import:py traceback;
-import:py requests;
-import:py uuid;
-import:py os;
-import:py base64;
-import:py from typing { Iterator, Union }
-import:py from logging { Logger }
-import:py from elevenlabs { Voice, VoiceSettings, stream, play }
-import:py from elevenlabs.client { ElevenLabs }
-import:jac from jivas.agent.action.tts_action { TTSAction }
+import logging;
+import traceback;
+import requests;
+import uuid;
+import os;
+import base64;
+import from typing { Iterator, Union }
+import from logging { Logger }
+import from elevenlabs { Voice, VoiceSettings, stream, play }
+import from elevenlabs.client { ElevenLabs }
+import from jivas.agent.action.tts_action { TTSAction }
 
 
-node ElevenLabsTTSAction :TTSAction: {
+node ElevenLabsTTSAction(TTSAction) {
     # A speech action which integrates with the Deepgram speech to text and text to speech API.
 
     # set up logger
@@ -20,7 +20,7 @@ node ElevenLabsTTSAction :TTSAction: {
     has model:str = "eleven_turbo_v2";
     has voice:str = "Sarah";
 
-    can invoke(text:str, as_base64:bool=False, as_url:bool=True) {
+    def invoke(text:str, as_base64:bool=False, as_url:bool=True) {
         # """
         # Convert text to speech and save the audio file using Deepgram API.
 
@@ -54,7 +54,7 @@ node ElevenLabsTTSAction :TTSAction: {
         return self.get_audio_as(audio, as_base64, as_url);
     }
 
-    can get_voices() {
+    def get_voices() {
         # returns all available voices
         client = ElevenLabs(api_key=self.api_key);
         if( result := client.voices.get_all() ) {
@@ -63,7 +63,7 @@ node ElevenLabsTTSAction :TTSAction: {
         return [];
     }
 
-    can get_models() {
+    def get_models() {
         # returns all available models
         client = ElevenLabs(api_key=self.api_key);
         if( result := client.models.get_all() ) {
@@ -72,7 +72,7 @@ node ElevenLabsTTSAction :TTSAction: {
         return [];
     }
 
-    can healthcheck() -> Union[bool, dict] {
+    def healthcheck() -> Union[bool, dict] {
         try {
             if(not self.api_key) {
                 return {

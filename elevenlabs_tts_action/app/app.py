@@ -8,8 +8,8 @@ and session state.
 from typing import Optional
 
 import streamlit as st
-from jvcli.client.lib.utils import call_action_walker_exec, call_update_action
-from jvcli.client.lib.widgets import app_header, app_update_action
+from jvclient.lib.utils import call_action_walker_exec, call_update_action
+from jvclient.lib.widgets import app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
 

@@ -1,8 +1,8 @@
 package:
   name: jivas/elevenlabs_tts_action
   author: V75 Inc.
-  architype: ElevenLabsTTSAction
-  version: 0.0.3
+  archetype: ElevenLabsTTSAction
+  version: 0.1.0
   meta:
     title: ElevenLabs Text-to-Speech Action
     description: A text-to-speech action which integrates with the ElevenLabs speech to text and text to speech API.
@@ -11,7 +11,7 @@ package:
   config:
     singleton: true
   dependencies:
-    jivas: ^2.0.0
+    jivas: ~2.1.0
     pip:
       elevenlabs: 1.13.0
 
