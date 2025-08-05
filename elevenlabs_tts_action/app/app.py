@@ -52,10 +52,12 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
                 or "elevenlabs_voices" not in st.session_state
             ):
                 models_result = call_api(
-                    endpoint="action/walker/elevenlabs_tts_action/get_models", json_data={"agent_id": agent_id}
+                    endpoint="action/walker/elevenlabs_tts_action/get_models",
+                    json_data={"agent_id": agent_id},
                 )
                 voices_result = call_api(
-                    endpoint="action/walker/elevenlabs_tts_action/get_voices", json_data={"agent_id": agent_id}
+                    endpoint="action/walker/elevenlabs_tts_action/get_voices",
+                    json_data={"agent_id": agent_id},
                 )
                 # Defensive checks
                 if (
