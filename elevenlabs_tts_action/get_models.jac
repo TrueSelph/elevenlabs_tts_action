@@ -8,6 +8,7 @@ walker get_models(agent_graph_walker) {
 
     has id:str = "";
     has response:list = [];
+    has reporting:bool = True;
 
     can on_agent with Agent entry {
         visit [-->](`?Actions);
@@ -19,6 +20,9 @@ walker get_models(agent_graph_walker) {
 
     can on_action with Action entry {
         self.response = here.get_models();
+        if self.reporting {
+            report self.response;
+        }
     }
 
 }
