@@ -9,3 +9,6 @@
 ## 0.0.3
 - Added check for API key in invoke
 - Update action app to fix false invalid API error
+
+# 0.1.0
+- Updated to support Jivas 2.1.0

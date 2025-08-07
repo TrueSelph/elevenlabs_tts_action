@@ -25,7 +25,7 @@ This action facilitates text-to-speech conversion through Elevenlabs API integra
 - **Singleton:** true
 
 ## Dependencies
-- **Jivas:** ^2.0.0
+- **Jivas:** ^2.1.0
 - **Elevenlabs:** 1.13.0
 
 ---

@@ -1,3 +1,5 @@
-include:jac elevenlabs_tts_action;
-include:jac get_models;
-include:jac get_voices;
+import from actions.jivas.elevenlabs_tts_action {
+    elevenlabs_tts_action,
+    get_models,
+    get_voices
+}

@@ -8,8 +8,8 @@ and session state.
 from typing import Optional
 
 import streamlit as st
-from jvcli.client.lib.utils import call_action_walker_exec, call_update_action
-from jvcli.client.lib.widgets import app_header, app_update_action
+from jvclient.lib.utils import call_api, call_update_action
+from jvclient.lib.widgets import app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
 
@@ -51,11 +51,13 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
                 "elevenlabs_models" not in st.session_state
                 or "elevenlabs_voices" not in st.session_state
             ):
-                models_result = call_action_walker_exec(
-                    agent_id, module_root, "get_models"
+                models_result = call_api(
+                    endpoint="action/walker/elevenlabs_tts_action/get_models",
+                    json_data={"agent_id": agent_id},
                 )
-                voices_result = call_action_walker_exec(
-                    agent_id, module_root, "get_voices"
+                voices_result = call_api(
+                    endpoint="action/walker/elevenlabs_tts_action/get_voices",
+                    json_data={"agent_id": agent_id},
                 )
                 # Defensive checks
                 if (
