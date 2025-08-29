@@ -58,7 +58,15 @@ node ElevenLabsTTSAction(TTSAction) {
         # returns all available voices
         client = ElevenLabs(api_key=self.api_key);
         if( result := client.voices.get_all() ) {
-            return result;
+            voices = [];
+            for voice in result.voices {
+                voices.append({
+                    "name": voice.name,
+                    "voice_id": voice.voice_id,
+                    "category": voice.category,
+                });
+            }
+            return voices;
         }
         return [];
     }
@@ -67,7 +75,16 @@ node ElevenLabsTTSAction(TTSAction) {
         # returns all available models
         client = ElevenLabs(api_key=self.api_key);
         if( result := client.models.get_all() ) {
-            return result;
+            models = [];
+            for model in result {
+                models.append({
+                    "name": model.name,
+                    "model_id": model.model_id,
+                    "description": model.description
+
+                });
+            }
+            return models;
         }
         return [];
     }

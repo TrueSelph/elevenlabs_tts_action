@@ -8,7 +8,7 @@ and session state.
 from typing import Optional
 
 import streamlit as st
-from jvclient.lib.utils import call_api, call_update_action
+from jvclient.lib.utils import call_api, call_update_action, get_reports_payload
 from jvclient.lib.widgets import app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
@@ -50,31 +50,33 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
             if (
                 "elevenlabs_models" not in st.session_state
                 or "elevenlabs_voices" not in st.session_state
-            ):
-                models_result = call_api(
+            ):  
+                models_result = []
+                models_result_ = call_api(
                     endpoint="action/walker/elevenlabs_tts_action/get_models",
                     json_data={"agent_id": agent_id},
                 )
-                voices_result = call_api(
+                if models_result_ and models_result_.status_code == 200:
+                    models_result = get_reports_payload(models_result_)
+
+                voices_result = []
+                voices_result_ = call_api(
                     endpoint="action/walker/elevenlabs_tts_action/get_voices",
                     json_data={"agent_id": agent_id},
                 )
+                if voices_result_ and voices_result_.status_code == 200:
+                    voices_result = get_reports_payload(voices_result_)
                 # Defensive checks
                 if (
                     not models_result
-                    or "error" in models_result
-                    or not isinstance(models_result, list)
                     or not voices_result
-                    or "error" in voices_result
-                    or "voices" not in voices_result
-                    or not isinstance(voices_result["voices"], list)
                 ):
                     fetch_error = True
                 else:
                     st.session_state["elevenlabs_models"] = models_result
-                    st.session_state["elevenlabs_voices"] = voices_result["voices"]
+                    st.session_state["elevenlabs_voices"] = voices_result
                     models = models_result
-                    voices = voices_result["voices"]
+                    voices = voices_result
             else:
                 models_candidate = st.session_state.get("elevenlabs_models")
                 voices_candidate = st.session_state.get("elevenlabs_voices")
