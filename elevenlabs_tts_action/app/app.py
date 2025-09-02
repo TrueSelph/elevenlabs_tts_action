@@ -50,7 +50,7 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
             if (
                 "elevenlabs_models" not in st.session_state
                 or "elevenlabs_voices" not in st.session_state
-            ):  
+            ):
                 models_result = []
                 models_result_ = call_api(
                     endpoint="action/walker/elevenlabs_tts_action/get_models",
@@ -67,10 +67,7 @@ def render(router: StreamlitRouter, agent_id: str, action_id: str, info: dict) -
                 if voices_result_ and voices_result_.status_code == 200:
                     voices_result = get_reports_payload(voices_result_)
                 # Defensive checks
-                if (
-                    not models_result
-                    or not voices_result
-                ):
+                if not models_result or not voices_result:
                     fetch_error = True
                 else:
                     st.session_state["elevenlabs_models"] = models_result
